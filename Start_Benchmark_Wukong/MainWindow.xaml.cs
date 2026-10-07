@@ -36,6 +36,10 @@ namespace Start_Benchmark_Wukong
             {
                 var info = ComputerSpecifications.Collect();
                 OutputBox.Text = info.ToDisplayString();
+                OutputBox.Text += Environment.NewLine + ComponentsBenchmark.GetBenchmarkStatus().ToString();
+                OutputBox.Text += Environment.NewLine + ComponentsBenchmark.BenchmarkInstallPath;
+                OutputBox.Text += Environment.NewLine + ComponentsBenchmark.ExeFilePath;
+                OutputBox.Text += Environment.NewLine + ComponentsBenchmark.ConfigFilePath;
             }
             catch (Exception ex)
             {

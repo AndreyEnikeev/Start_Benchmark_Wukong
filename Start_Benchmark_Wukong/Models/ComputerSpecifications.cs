@@ -146,7 +146,7 @@ namespace Start_Benchmark_Wukong.Models
                 sb.AppendLine();
 
                 sb.AppendLine("▸ Экран");
-                sb.AppendLine($"    Текущий режим     : {Display.Current.Width} × {Display.Current.Height} @ {Display.Current.RefreshRate} Гц");
+                sb.AppendLine($"    Текущий режим     : {Display.Current}");
                 sb.AppendLine($"    Максимум          : {Display.MaxResolutionMode}");
                 sb.AppendLine($"    Минимум           : {Display.MinResolutionMode}");
                 sb.AppendLine();
