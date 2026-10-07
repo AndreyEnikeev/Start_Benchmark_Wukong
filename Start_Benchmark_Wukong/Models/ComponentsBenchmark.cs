@@ -47,12 +47,32 @@ namespace Start_Benchmark_Wukong.Models
 
                 // Нашли — запоминаем пути
                 BenchmarkInstallPath = fullPath;
-                ExeFilePath = Path.Combine(fullPath, "b1", "Binaries", "Win64", "b1-Win64-Shipping.exe");
-                if (!File.Exists(ExeFilePath))
+                string binariesDir = Path.Combine(fullPath, "b1", "Binaries", "Win64");
+                ExeFilePath = Path.Combine(binariesDir, "b1-Win64-Shipping.exe");
+                if (!File.Exists(ExeFilePath) && Directory.Exists(binariesDir))
                 {
-                    BenchmarkInstallPath = string.Empty;
-                    ExeFilePath = string.Empty;
-                    continue;
+                    // Известные «не те» exe, которые могут лежать рядом
+                    var exclude = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "CrashReportClient.exe",
+                        "UnrealCEFSubProcess.exe",
+                        "EpicWebHelper.exe"
+                    };
+                    foreach (string exe in Directory.GetFiles(binariesDir, "*.exe"))
+                    {
+                        string name = Path.GetFileName(exe);
+                        if (!exclude.Contains(name))
+                        {
+                            ExeFilePath = Path.Combine(binariesDir, name);
+                            break;
+                        }
+                    }
+                    if (!File.Exists(ExeFilePath))
+                    {
+                        BenchmarkInstallPath = string.Empty;
+                        ExeFilePath = string.Empty;
+                        continue;
+                    }
                 }
 
                 ConfigFilePath = Path.Combine(fullPath, "b1", "Saved", "Config", "Windows", "GameUserSettings.ini");
