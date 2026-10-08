@@ -95,22 +95,22 @@ namespace Start_Benchmark_Wukong.Models
             public string ReleaseDate { get; set; } = "н/д";
         }
         /// <summary></summary>
-        public class SystemInfo
+        public static class SystemInfo
         {
             /// <summary>ЦП</summary>
-            public CpuInfo Cpu { get; set; } = new();
+            public static CpuInfo Cpu { get; set; } = new();
             /// <summary>Список видеокарт</summary>
-            public List<GpuInfo> Gpus { get; set; } = new();
+            public static List<GpuInfo> Gpus { get; set; } = new();
             /// <summary>Оперативная память</summary>
-            public RamInfo Ram { get; set; } = new();
+            public static RamInfo Ram { get; set; } = new();
             /// <summary>Монитор</summary>
-            public DisplayInfo Display { get; set; } = new();
+            public static DisplayInfo Display { get; set; } = new();
             /// <summary>ОС</summary>
-            public OsInfo Os { get; set; } = new();
+            public static OsInfo Os { get; set; } = new();
             /// <summary>БОИС</summary>
-            public BiosInfo Bios { get; set; } = new();
+            public static BiosInfo Bios { get; set; } = new();
             /// <summary>Вывод информации</summary>
-            public string ToDisplayString()
+            public static string ToDisplayString()
             {
                 var sb = new StringBuilder();
 
@@ -309,22 +309,18 @@ namespace Start_Benchmark_Wukong.Models
         //  Точка входа
         // ═════════════════════════════════════════════
         /// <summary>Запуск сбора информации</summary>
-        /// <returns>Класс с собраной информацией</returns>
-        public static SystemInfo Collect()
+        public static void Collect()
         {
-            SystemInfo info = new SystemInfo();
-            CollectCpu(info);
-            CollectGpus(info);
-            CollectRam(info);
-            CollectDisplay(info);
-            CollectOs(info);
-            CollectBios(info);
-            return info;
+            CollectCpu();
+            CollectGpus();
+            CollectRam();
+            CollectDisplay();
+            CollectOs();
+            CollectBios();
         }
 
         /// <summary>Сбор информации о ЦП</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectCpu(SystemInfo info)
+        private static void CollectCpu()
         {
             try
             {
@@ -334,10 +330,10 @@ namespace Start_Benchmark_Wukong.Models
                 if (key != null)
                 {
                     // ProcessorNameString = REG_SZ, человекочитаемое имя CPU
-                    info.Cpu.Name = GetString(key, "ProcessorNameString", "Unknown");
+                    SystemInfo.Cpu.Name = GetString(key, "ProcessorNameString", "Unknown");
 
                     // ~MHz = REG_DWORD, номинальная частота в МГц (не Boost!)
-                    info.Cpu.MaxClockMhz = key.GetValue("~MHz") switch
+                    SystemInfo.Cpu.MaxClockMhz = key.GetValue("~MHz") switch
                     {
                         int i => (uint)i,        // REG_DWORD
                         uint u => u,
@@ -353,10 +349,10 @@ namespace Start_Benchmark_Wukong.Models
 
             // Environment.ProcessorCount — это количество ЛОГИЧЕСКИХ процессоров,
             // включая Hyper-Threading (у 8-ядерного с HT будет 16)
-            info.Cpu.LogicalProcessors = (uint)Environment.ProcessorCount;
+            SystemInfo.Cpu.LogicalProcessors = (uint)Environment.ProcessorCount;
 
             // Физические ядра считаем через P/Invoke — Environment этого не знает
-            info.Cpu.Cores = (uint)GetPhysicalCoreCount();
+            SystemInfo.Cpu.Cores = (uint)GetPhysicalCoreCount();
         }
         /// <summary>Расчёт количество физических ядер в ЦП</summary>
         /// <returns>Кол-во ядер</returns>
@@ -397,8 +393,7 @@ namespace Start_Benchmark_Wukong.Models
         }
 
         /// <summary>Сбор информации о видеокарта</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectGpus(SystemInfo info)
+        private static void CollectGpus()
         {
             // GUID класса «Display adapters» (видеоадаптеры).
             // Это стандартный идентификатор Windows, он одинаков на всех системах.
@@ -446,7 +441,7 @@ namespace Start_Benchmark_Wukong.Models
                         };
                     }
 
-                    info.Gpus.Add(gpu);
+                    SystemInfo.Gpus.Add(gpu);
                 }
             }
             catch (Exception ex)
@@ -456,8 +451,7 @@ namespace Start_Benchmark_Wukong.Models
         }
 
         /// <summary>Сбор информации о оперативной памяти</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectRam(SystemInfo info)
+        private static void CollectRam()
         {
             try
             {
@@ -468,7 +462,7 @@ namespace Start_Benchmark_Wukong.Models
                 };
 
                 if (GlobalMemoryStatusEx(mem))
-                    info.Ram.TotalBytes = mem.ullTotalPhys;
+                    SystemInfo.Ram.TotalBytes = mem.ullTotalPhys;
             }
             catch (Exception ex)
             {
@@ -477,8 +471,7 @@ namespace Start_Benchmark_Wukong.Models
         }
 
         /// <summary>Сбор информации о мониторе</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectDisplay(SystemInfo info)
+        private static void CollectDisplay()
         {
             var modes = new List<DisplayMode>();
             var seen = new HashSet<(int, int, int)>();
@@ -514,7 +507,7 @@ namespace Start_Benchmark_Wukong.Models
                 modeNum++;
             }
 
-            if(modes.Count == 0)
+            if (modes.Count == 0)
             {
                 return;
             }
@@ -525,21 +518,21 @@ namespace Start_Benchmark_Wukong.Models
                 int byArea = ((long)a.Width * a.Height).CompareTo((long)b.Width * b.Height);
                 return byArea != 0 ? byArea : a.RefreshRate.CompareTo(b.RefreshRate);
             });
-            info.Display.MaxResolutionMode = modes.OrderByDescending(m => (long)m.Width * m.Height).ThenByDescending(m => m.RefreshRate).First();
-            info.Display.MinResolutionMode = modes.OrderBy(m => (long)m.Width * m.Height).ThenByDescending(m => m.RefreshRate).First();
+            SystemInfo.Display.MinResolutionMode = modes.OrderBy(m => (long)m.Width * m.Height).ThenByDescending(m => m.RefreshRate).First();
+            var best = modes.Where(m => m.RefreshRate >= 60).OrderByDescending(m => (long)m.Width * m.Height).ThenByDescending(m => m.RefreshRate).FirstOrDefault();
+            SystemInfo.Display.MaxResolutionMode = best ?? modes.OrderByDescending(m => (long)m.Width * m.Height).ThenByDescending(m => m.RefreshRate).First();
             if (EnumDisplaySettings(null, -1, ref devMode))
             {
-                info.Display.Current = new DisplayMode { Width = devMode.dmPelsWidth, Height = devMode.dmPelsHeight, RefreshRate = devMode.dmDisplayFrequency };
+                SystemInfo.Display.Current = new DisplayMode { Width = devMode.dmPelsWidth, Height = devMode.dmPelsHeight, RefreshRate = devMode.dmDisplayFrequency };
             }
             else
             {
-                info.Display.Current = info.Display.MinResolutionMode;
+                SystemInfo.Display.Current = SystemInfo.Display.MinResolutionMode;
             }
         }
 
         /// <summary>Сбор информации об ОС</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectOs(SystemInfo info)
+        private static void CollectOs()
         {
             try
             {
@@ -554,11 +547,11 @@ namespace Start_Benchmark_Wukong.Models
                     string display = GetString(key, "DisplayVersion", string.Empty);
 
                     Version osVer = Environment.OSVersion.Version;
-                    info.Os.Version = $"{osVer.Major}.{osVer.Minor}.{osVer.Build}";
+                    SystemInfo.Os.Version = $"{osVer.Major}.{osVer.Minor}.{osVer.Build}";
 
-                    info.Os.Caption = product;
+                    SystemInfo.Os.Caption = product;
                     if (!string.IsNullOrEmpty(display))
-                        info.Os.Caption += $" ({display})";
+                        SystemInfo.Os.Caption += $" ({display})";
                 }
             }
             catch (Exception ex)
@@ -567,22 +560,21 @@ namespace Start_Benchmark_Wukong.Models
             }
 
             // Fallback — если реестр не дал версию, берём из Environment.OSVersion
-            if (string.IsNullOrEmpty(info.Os.Version) || info.Os.Version == "н/д")
+            if (string.IsNullOrEmpty(SystemInfo.Os.Version) || SystemInfo.Os.Version == "н/д")
             {
                 var v = Environment.OSVersion.Version;
-                info.Os.Version = $"{v.Major}.{v.Minor}.{v.Build}";
+                SystemInfo.Os.Version = $"{v.Major}.{v.Minor}.{v.Build}";
             }
 
             // RuntimeInformation.OSArchitecture — "X64", "Arm64", "X86"
-            info.Os.Architecture = RuntimeInformation.OSArchitecture.ToString();
+            SystemInfo.Os.Architecture = RuntimeInformation.OSArchitecture.ToString();
 
             // Environment.Is64BitProcess — true, если наше приложение 64-битное
-            info.Os.Is64BitProcess = Environment.Is64BitProcess;
+            SystemInfo.Os.Is64BitProcess = Environment.Is64BitProcess;
         }
 
         /// <summary>Сбор информации о БИОС</summary>
-        /// <param name="info">Класс собираемой информацией</param>
-        private static void CollectBios(SystemInfo info)
+        private static void CollectBios()
         {
             try
             {
@@ -592,10 +584,10 @@ namespace Start_Benchmark_Wukong.Models
                 if (key == null) return;
 
                 // BIOSVendor = REG_SZ, например "American Megatrends Inc."
-                info.Bios.Vendor = GetString(key, "BIOSVendor", "Unknown");
+                SystemInfo.Bios.Vendor = GetString(key, "BIOSVendor", "Unknown");
 
                 // BIOSVersion — капризный параметр: может быть REG_SZ или REG_MULTI_SZ
-                info.Bios.Version = key.GetValue("BIOSVersion") switch
+                SystemInfo.Bios.Version = key.GetValue("BIOSVersion") switch
                 {
                     string[] ver => ver.Length == 0 ? "н/д" : string.Join(" ", ver).Trim(),
                     string ver when !string.IsNullOrWhiteSpace(ver) => ver.Trim(),
@@ -603,7 +595,7 @@ namespace Start_Benchmark_Wukong.Models
                 };
 
                 // BIOSReleaseDate = REG_SZ, формат обычно "MM/DD/YYYY"
-                info.Bios.ReleaseDate = GetString(key, "BIOSReleaseDate", "н/д");
+                SystemInfo.Bios.ReleaseDate = GetString(key, "BIOSReleaseDate", "н/д");
             }
             catch (Exception ex)
             {

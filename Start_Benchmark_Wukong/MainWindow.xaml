@@ -1,32 +1,37 @@
 ﻿<Window x:Class="Start_Benchmark_Wukong.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Start_Benchmark_Wukong"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="16">
+        Title="Benchmark Wukong — Автозапуск" Height="380" Width="680"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="BtnCollect"
-                Grid.Row="0"
-                Content="Собрать информацию о системе"
-                Padding="12,6"
-                HorizontalAlignment="Left"
-                Click="BtnCollect_Click"/>
+        <TextBlock Grid.Row="0" Text="Автоматический запуск бенчмарка"
+                   FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/>
 
-        <TextBox x:Name="OutputBox"
-                 Grid.Row="1"
-                 Margin="0,12,0,0"
-                 IsReadOnly="True"
-                 FontFamily="Consolas"
-                 FontSize="13"
-                 TextWrapping="NoWrap"
-                 VerticalScrollBarVisibility="Auto"
-                 HorizontalScrollBarVisibility="Auto"/>
+        <TextBlock Grid.Row="1" x:Name="StageText" Text="Инициализация..."
+                   FontSize="13" Margin="0,0,0,8" TextWrapping="Wrap"/>
+
+        <ProgressBar Grid.Row="2" x:Name="Progress" Height="22"
+                     Minimum="0" Maximum="100" Value="0"
+                     Margin="0,0,0,10"/>
+
+        <Border Grid.Row="3" BorderBrush="#DDD" BorderThickness="1"
+                Background="#FAFAFA" Padding="8" CornerRadius="3">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="LogText" FontFamily="Consolas"
+                           FontSize="12" TextWrapping="Wrap"/>
+            </ScrollViewer>
+        </Border>
+
+        <Button Grid.Row="4" x:Name="CancelButton" Content="Отмена"
+                Width="110" Height="30" HorizontalAlignment="Right"
+                Margin="0,10,0,0" Click="CancelButton_Click"/>
     </Grid>
 </Window>

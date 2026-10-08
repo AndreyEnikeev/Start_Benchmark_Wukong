@@ -1,0 +1,730 @@
+﻿<Window x:Class="Start_Benchmark_Wukong.ResultsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Результаты бенчмарка" Height="780" Width="1080"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <!-- Подпись параметра (слева) -->
+        <Style x:Key="RowLabel" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,2,8,2"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Значение параметра (справа): read-only TextBox без рамки.
+             Внешне как текст, но выделяется и копируется. -->
+        <Style x:Key="ValueBox" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,2,0,2"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="IBeam"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#222"/>
+        </Style>
+
+        <!-- Настройка теста (фиксированная надпись) -->
+        <Style x:Key="SettingLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="SettingValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Заголовок секции -->
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,14,0,6"/>
+        </Style>
+    </Window.Resources>
+
+    <TabControl Margin="10">
+
+        <!-- ═══════════════════ Характеристики ПК ═══════════════════ -->
+        <TabItem Header="Характеристики ПК">
+            <ScrollViewer Padding="10" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+
+                    <!-- CPU -->
+                    <TextBlock Text="▸ CPU" Style="{StaticResource SectionHeader}" Margin="0,0,0,6"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Модель" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="CpuNameBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Ядра (физические)" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="CpuCoresBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Потоки (логические)" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="CpuThreadsBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Макс. частота" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="3" Grid.Column="1" x:Name="CpuFreqBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+
+                    <!-- GPU -->
+                    <TextBlock Text="▸ GPU" Style="{StaticResource SectionHeader}"/>
+
+                    <TextBlock x:Name="GpuNotFoundText" Text="Не обнаружено"
+                               Visibility="Collapsed" Margin="0,2,0,2" FontSize="13"/>
+
+                    <StackPanel x:Name="GpuBlock1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Устройство [1]" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="0" Grid.Column="1" x:Name="Gpu1NameBox" Style="{StaticResource ValueBox}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Драйвер" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="1" Grid.Column="1" x:Name="Gpu1DriverBox" Style="{StaticResource ValueBox}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="VRAM" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="2" Grid.Column="1" x:Name="Gpu1VramBox" Style="{StaticResource ValueBox}"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel x:Name="GpuBlock2" Margin="0,8,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Устройство [2]" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="0" Grid.Column="1" x:Name="Gpu2NameBox" Style="{StaticResource ValueBox}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Драйвер" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="1" Grid.Column="1" x:Name="Gpu2DriverBox" Style="{StaticResource ValueBox}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="VRAM" Style="{StaticResource RowLabel}"/>
+                            <TextBox   Grid.Row="2" Grid.Column="1" x:Name="Gpu2VramBox" Style="{StaticResource ValueBox}"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- RAM -->
+                    <TextBlock Text="▸ RAM" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Общий объём" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Column="1" x:Name="RamTotalBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+
+                    <!-- Экран -->
+                    <TextBlock Text="▸ Экран" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Текущий режим" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="DispCurrentBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Максимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="DispMaxBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Минимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="DispMinBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+
+                    <!-- ОС -->
+                    <TextBlock Text="▸ Операционная система" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Название" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="OsCaptionBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Версия" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="OsVersionBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Разрядность ОС" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="OsArchBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Процесс 64-бит" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="3" Grid.Column="1" x:Name="Os64BitBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+
+                    <!-- BIOS -->
+                    <TextBlock Text="▸ BIOS" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Производитель" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="BiosVendorBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Версия" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="BiosVersionBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Дата" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="BiosDateBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- ═══════════════════ CPU-тест ═══════════════════ -->
+        <TabItem Header="CPU-тест">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Слева: результаты -->
+                <GroupBox Grid.Row="0" Grid.Column="0" Header="Результаты CPU-теста"
+                          Padding="10" Margin="0,0,8,8">
+                    <Grid VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Средний FPS" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="CpuAvgBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Максимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="CpuMaxBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Минимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="CpuMinBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="5-й перцентиль" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="3" Grid.Column="1" x:Name="CpuP5Box" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Использовано VRAM" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="4" Grid.Column="1" x:Name="CpuVramBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Справа: параметры -->
+                <GroupBox Grid.Row="0" Grid.Column="1" Header="Параметры теста"
+                          Padding="10" Margin="8,0,0,8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+
+                            <!-- Основные параметры -->
+                            <TextBlock Text="Основные" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Уровень качества" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="CpuLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Масштаб разрешения, %" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="CpuQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Ширина, px" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CpuWidthText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Высота, px" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="CpuHeightText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                            <Separator Margin="0,12"/>
+
+                            <!-- Scalability groups -->
+                            <TextBlock Text="sg.* — уровни качества (0..4)" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0"  Grid.Column="0" Text="Масштаб разрешения"    Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0"  Grid.Column="1" x:Name="CpuSgResQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1"  Grid.Column="0" Text="Дальность прорисовки"  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1"  Grid.Column="1" x:Name="CpuSgViewDistanceText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2"  Grid.Column="0" Text="Сглаживание"           Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2"  Grid.Column="1" x:Name="CpuSgAntiAliasingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3"  Grid.Column="0" Text="Тени"                  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3"  Grid.Column="1" x:Name="CpuSgShadowText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="4"  Grid.Column="0" Text="Глобальное освещение"  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="4"  Grid.Column="1" x:Name="CpuSgGlobalIlluminationText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="5"  Grid.Column="0" Text="Трассировка лучей"     Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="5"  Grid.Column="1" x:Name="CpuSgRayTracingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="6"  Grid.Column="0" Text="Отражения"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="6"  Grid.Column="1" x:Name="CpuSgReflectionText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="7"  Grid.Column="0" Text="Постобработка"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="7"  Grid.Column="1" x:Name="CpuSgPostProcessText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="8"  Grid.Column="0" Text="Текстуры"              Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="8"  Grid.Column="1" x:Name="CpuSgTextureText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="9"  Grid.Column="0" Text="Эффекты"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="9"  Grid.Column="1" x:Name="CpuSgEffectsText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Растительность"        Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="1" x:Name="CpuSgFoliageText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="11" Grid.Column="0" Text="Шейдинг"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="11" Grid.Column="1" x:Name="CpuSgShadingText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                            <Separator Margin="0,12"/>
+
+                            <!-- UISettingData -->
+                            <TextBlock Text="UISettingData — детальные настройки" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0"  Grid.Column="0" Text="Общий уровень качества"        Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0"  Grid.Column="1" x:Name="CpuUiQualityLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1"  Grid.Column="0" Text="Дальность прорисовки"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1"  Grid.Column="1" x:Name="CpuUiViewDistanceText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2"  Grid.Column="0" Text="Сглаживание"                  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2"  Grid.Column="1" x:Name="CpuUiAntiAliasingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3"  Grid.Column="0" Text="Постобработка"                Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3"  Grid.Column="1" x:Name="CpuUiPostProcessingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="4"  Grid.Column="0" Text="Качество теней"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="4"  Grid.Column="1" x:Name="CpuUiShadowQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="5"  Grid.Column="0" Text="Качество текстур"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="5"  Grid.Column="1" x:Name="CpuUiTextureQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="6"  Grid.Column="0" Text="Качество эффектов"            Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="6"  Grid.Column="1" x:Name="CpuUiFxQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="7"  Grid.Column="0" Text="Качество материалов"          Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="7"  Grid.Column="1" x:Name="CpuUiMaterialQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="8"  Grid.Column="0" Text="Качество растительности"      Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="8"  Grid.Column="1" x:Name="CpuUiVegetationQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="9"  Grid.Column="0" Text="Глобальное освещение"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="9"  Grid.Column="1" x:Name="CpuUiGlobalIlluminationText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Качество отражений"           Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="1" x:Name="CpuUiReflectionQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="11" Grid.Column="0" Text="Трассировка лучей (RTX)"      Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="11" Grid.Column="1" x:Name="CpuUiRtxText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="12" Grid.Column="0" Text="Уровень трассировки лучей"    Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="12" Grid.Column="1" x:Name="CpuUiRtxLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="13" Grid.Column="0" Text="DLSS (масштабирование NVIDIA)" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="13" Grid.Column="1" x:Name="CpuUiDlssText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="14" Grid.Column="0" Text="Графический API"              Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="14" Grid.Column="1" x:Name="CpuUiDx12Text" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="15" Grid.Column="0" Text="Генерация кадров"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="15" Grid.Column="1" x:Name="CpuUiInsertFrameText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="16" Grid.Column="0" Text="Супер-разрешение (апскейл)"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="16" Grid.Column="1" x:Name="CpuUiSuperResolutionSamplingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="17" Grid.Column="0" Text="Вертикальная синхронизация"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="17" Grid.Column="1" x:Name="CpuUiVsyncText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="18" Grid.Column="0" Text="Ограничение частоты кадров"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="18" Grid.Column="1" x:Name="CpuUiLockFrameRateText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="19" Grid.Column="0" Text="Размытие движения"            Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="19" Grid.Column="1" x:Name="CpuUiMotionBlurText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+
+                <!-- Кнопки -->
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                            Orientation="Horizontal" Margin="0,4,0,4">
+                    <Button Content="Открыть скриншот" Width="160" Height="30"
+                            Margin="10,0,0,0" Click="OpenCpuScreenshot_Click"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                           x:Name="CpuStatus" FontSize="12" Foreground="Gray"
+                           Margin="0,4,0,0"/>
+            </Grid>
+        </TabItem>
+
+        <!-- ═══════════════════ GPU-тест ═══════════════════ -->
+        <TabItem Header="GPU-тест">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <GroupBox Grid.Row="0" Grid.Column="0" Header="Результаты GPU-теста"
+                          Padding="10" Margin="0,0,8,8">
+                    <Grid VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Средний FPS" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="0" Grid.Column="1" x:Name="GpuAvgBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Максимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="1" Grid.Column="1" x:Name="GpuMaxBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Минимум" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="2" Grid.Column="1" x:Name="GpuMinBox" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="5-й перцентиль" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="3" Grid.Column="1" x:Name="GpuP5Box" Style="{StaticResource ValueBox}"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Использовано VRAM" Style="{StaticResource RowLabel}"/>
+                        <TextBox   Grid.Row="4" Grid.Column="1" x:Name="GpuVramBox" Style="{StaticResource ValueBox}"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="0" Grid.Column="1" Header="Параметры теста"
+                          Padding="10" Margin="8,0,0,8">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+
+                            <!-- Основные параметры -->
+                            <TextBlock Text="Основные" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Уровень качества" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="GpuLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Масштаб разрешения, %" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="GpuQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Ширина, px" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GpuWidthText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Высота, px" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="GpuHeightText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                            <Separator Margin="0,12"/>
+
+                            <!-- Scalability groups -->
+                            <TextBlock Text="sg.* — уровни качества (0..4)" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0"  Grid.Column="0" Text="Масштаб разрешения"    Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0"  Grid.Column="1" x:Name="GpuSgResQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1"  Grid.Column="0" Text="Дальность прорисовки"  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1"  Grid.Column="1" x:Name="GpuSgViewDistanceText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2"  Grid.Column="0" Text="Сглаживание"           Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2"  Grid.Column="1" x:Name="GpuSgAntiAliasingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3"  Grid.Column="0" Text="Тени"                  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3"  Grid.Column="1" x:Name="GpuSgShadowText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="4"  Grid.Column="0" Text="Глобальное освещение"  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="4"  Grid.Column="1" x:Name="GpuSgGlobalIlluminationText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="5"  Grid.Column="0" Text="Трассировка лучей"     Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="5"  Grid.Column="1" x:Name="GpuSgRayTracingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="6"  Grid.Column="0" Text="Отражения"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="6"  Grid.Column="1" x:Name="GpuSgReflectionText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="7"  Grid.Column="0" Text="Постобработка"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="7"  Grid.Column="1" x:Name="GpuSgPostProcessText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="8"  Grid.Column="0" Text="Текстуры"              Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="8"  Grid.Column="1" x:Name="GpuSgTextureText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="9"  Grid.Column="0" Text="Эффекты"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="9"  Grid.Column="1" x:Name="GpuSgEffectsText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Растительность"        Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="1" x:Name="GpuSgFoliageText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="11" Grid.Column="0" Text="Шейдинг"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="11" Grid.Column="1" x:Name="GpuSgShadingText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                            <Separator Margin="0,12"/>
+
+                            <!-- UISettingData -->
+                            <TextBlock Text="UISettingData — детальные настройки" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0"  Grid.Column="0" Text="Общий уровень качества"        Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="0"  Grid.Column="1" x:Name="GpuUiQualityLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="1"  Grid.Column="0" Text="Дальность прорисовки"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="1"  Grid.Column="1" x:Name="GpuUiViewDistanceText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="2"  Grid.Column="0" Text="Сглаживание"                  Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="2"  Grid.Column="1" x:Name="GpuUiAntiAliasingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="3"  Grid.Column="0" Text="Постобработка"                Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="3"  Grid.Column="1" x:Name="GpuUiPostProcessingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="4"  Grid.Column="0" Text="Качество теней"               Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="4"  Grid.Column="1" x:Name="GpuUiShadowQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="5"  Grid.Column="0" Text="Качество текстур"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="5"  Grid.Column="1" x:Name="GpuUiTextureQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="6"  Grid.Column="0" Text="Качество эффектов"            Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="6"  Grid.Column="1" x:Name="GpuUiFxQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="7"  Grid.Column="0" Text="Качество материалов"          Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="7"  Grid.Column="1" x:Name="GpuUiMaterialQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="8"  Grid.Column="0" Text="Качество растительности"      Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="8"  Grid.Column="1" x:Name="GpuUiVegetationQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="9"  Grid.Column="0" Text="Глобальное освещение"         Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="9"  Grid.Column="1" x:Name="GpuUiGlobalIlluminationText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Качество отражений"           Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="10" Grid.Column="1" x:Name="GpuUiReflectionQualityText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="11" Grid.Column="0" Text="Трассировка лучей (RTX)"      Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="11" Grid.Column="1" x:Name="GpuUiRtxText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="12" Grid.Column="0" Text="Уровень трассировки лучей"    Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="12" Grid.Column="1" x:Name="GpuUiRtxLevelText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="13" Grid.Column="0" Text="DLSS (масштабирование NVIDIA)" Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="13" Grid.Column="1" x:Name="GpuUiDlssText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="14" Grid.Column="0" Text="Графический API"              Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="14" Grid.Column="1" x:Name="GpuUiDx12Text" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="15" Grid.Column="0" Text="Генерация кадров"             Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="15" Grid.Column="1" x:Name="GpuUiInsertFrameText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="16" Grid.Column="0" Text="Супер-разрешение (апскейл)"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="16" Grid.Column="1" x:Name="GpuUiSuperResolutionSamplingText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="17" Grid.Column="0" Text="Вертикальная синхронизация"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="17" Grid.Column="1" x:Name="GpuUiVsyncText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="18" Grid.Column="0" Text="Ограничение частоты кадров"   Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="18" Grid.Column="1" x:Name="GpuUiLockFrameRateText" Style="{StaticResource SettingValue}"/>
+
+                                <TextBlock Grid.Row="19" Grid.Column="0" Text="Размытие движения"            Style="{StaticResource SettingLabel}"/>
+                                <TextBlock Grid.Row="19" Grid.Column="1" x:Name="GpuUiMotionBlurText" Style="{StaticResource SettingValue}"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                            Orientation="Horizontal" Margin="0,4,0,4">
+                    <Button Content="Открыть скриншот" Width="160" Height="30"
+                            Margin="10,0,0,0" Click="OpenGpuScreenshot_Click"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                           x:Name="GpuStatus" FontSize="12" Foreground="Gray"
+                           Margin="0,4,0,0"/>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>
