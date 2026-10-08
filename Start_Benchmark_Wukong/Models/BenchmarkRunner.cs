@@ -93,7 +93,9 @@ namespace Start_Benchmark_Wukong.Models
                 await Task.Delay(TestDurationSec * 1000);
 
                 // 7. Скриншот результатов
-                string resultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "screenBenchmark", $"benchmark_result_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+                string resultPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "screenBenchmark");
+                Directory.CreateDirectory(resultPath);
+                resultPath = Path.Combine(resultPath, $"benchmark_result_{DateTime.Now:yyyyMMdd_HHmmss}.png");
 
                 var bmp = CaptureWindow(hwnd);
                 if
